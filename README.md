@@ -1,0 +1,2 @@
+# Smash Hash
+ 
