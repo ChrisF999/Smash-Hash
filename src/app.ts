@@ -1,104 +1,90 @@
-import { Hash } from "crypto";
-const { GPU } = require('gpu.js');
-const term = require('terminal-kit').terminal;
-const fs = require('fs-extra')
+import crypto from "crypto";
+import fs, { copySync } from "fs-extra";
+import lineReader from "line-reader";
 
-try {
-    const crypto = require('crypto');
-} catch (err) {
-    console.log('crypto support is disabled!');
-    process.exit()
+
+//MD5 Hash Fuction
+function MD5(tohash: string) {
+    return (crypto.createHash('MD5').update(tohash).digest("hex"))
 }
-const readline = require('readline');
-term.clear()
-term.bold('Choose a file: ');
-const countLinesInFile = require('count-lines-in-file');
-const cliProgress = require('cli-progress');
-const md5 = require('md5');// const readline = require('linebyline');
+//SHA1 Hash Fuction
+function SHA1(tohash: string) {
+    return (crypto.createHash('SHA1').update(tohash).digest("hex"))
+}
+//SHA256 Hash Fuction
+function SHA256(tohash: string) {
+    return (crypto.createHash('SHA256').update(tohash).digest("hex"))
+}
+//SHA224 Hash Function
+function SHA224(tohash: string) {
+    return (crypto.createHash('SHA224').update(tohash).digest('hex'))
+}
+//SHA512 Hash Function
+function SHA512(tohash: string) {
+    return (crypto.createHash('SHA512').update(tohash).digest('hex'))
+}
+//SHA384 Hash Function
+function SHA384(tohash: string) {
+    return (crypto.createHash('SHA384').update(tohash).digest('hex'))
+}
+//SHA3 Hash Function
+function SHA3(tohash: string) {
+    return (crypto.createHash('SHA3').update(tohash).digest('hex'))
+}
+//RIPEMD160 Hash Function
+function RIPEMD160(tohash: string) {
+    return (crypto.createHash('RIPEMD160').update(tohash).digest('hex'))
+}
+//CVS File Saver
+function csvSave(toCVSPass: string, toCVSHash: string, path: string, delimiter: string) {
+    try {
+        fs.ensureFile(path)
+        //console.log('File Exits')
+        fs.appendFile(path, `${toCVSPass}${delimiter}${toCVSHash}\r\n`, (err) => {
+            if (err) throw err;
+        });
 
-
-
-
-term.fileInput(
-    { baseDir: './' },
-    function (error: string, path: string) {
-        if (error) {
-            term.red.bold("\nAn error occurs: " + error + "\n");
-            return process.exit(1)
-        }
-        else {
-            fs.pathExists(path)
-                .then((exists: boolean) => {
-                    if (exists == true) {
-                        term.green(`\nFile Found at ${path}\n`)
-
-                        var items = ['Yes', 'No'];
-                        term(`Do you want to continue with the current file.`).bold(`${path}`)
-                        const options = {
-                            style: term.inverse,
-                            selectedStyle: term.dim.blue.bgGreen
-                        };
-
-                        term.singleLineMenu(items, options, function (error: any, response: { selectedIndex: any; selectedText: any; x: any; y: any; }) {
-                            term('\n').eraseLineAfter.green(
-                                "%s selected.\n",
-                                response.selectedText,
-                            );
-                            if (response.selectedIndex == 0) {
-                                countLinesInFile(path, async (error: Error, numberOfLines: number) => {
-                                    const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_grey);
-                                    bar1.start(numberOfLines, 0);
-                                    const readEachLineSync = require('read-each-line-sync')
-
-                                    let ting: any;
-
-                                    let toSave: Array<any> = [];
-
-                                    readEachLineSync(path, 'utf8', function (line: any) {
-
-                                        ting = md5(line);
-
-                                        toSave.push({ password: line, hash: ting });
-                                        bar1.increment();
-
-                                    })
-                                    bar1.stop();
-                                    term.bold("Select output file (will create if file doesn't exist)\n")
-                                    term.fileInput(
-                                        { baseDir: './' },
-                                        function (error: string, outpath: string) {
-                                            if (error) {
-                                                term.red.bold("\nAn error occurs: " + error + "\n");
-                                                return process.exit(1)
-                                            } else {
-                                                fs.writeFile(`${outpath}.json`, JSON.stringify(toSave, null, '\t'), function (err: any) {
-                                                    if (err) throw err;
-                                                    console.log(`Saved: ${toSave.length} Hashes`);
-                                                    process.exit()
-                                                });
-                                            }
-                                        })
-
-
-
-                                    //process.exit()
-                                });
-                            } else {
-                                process.exit()
-                            }
-                        });
-                    }
-                    else {
-                        term.red(`\nFile not found at ${path}\n`)
-                        process.exit()
-                    }
-                })  // => false
-                .catch((error: any) => {
-                    //  term.red(error)
-                    process.exit()
-                })
-
-        }
-
+    } catch (err) {
+        console.error(err)
     }
-);
+}
+//Hashes from a Plain Text file line by line no bufffer
+async function hashFromfileNoBuffer(path: string, hashtype: string, savePath: string, delimiter: string) {
+    const readline = require('readline').createInterface({
+        input: require('fs').createReadStream(path)
+    });
+
+    readline.on('line', function (line: string) {
+        switch (hashtype) {
+            case "MD5":
+                csvSave(line, MD5(line), savePath, delimiter)
+                break;
+            case "SHA1":
+                csvSave(line, SHA1(line), savePath, delimiter)
+                break;
+            case "SHA256":
+                csvSave(line, SHA256(line), savePath, delimiter)
+                break
+            case "SHA224":
+                csvSave(line, SHA224(line), savePath, delimiter)
+                break
+            case "SHA512":
+                csvSave(line, SHA512(line), savePath, delimiter)
+                break
+            case "SHA384":
+                csvSave(line, SHA384(line), savePath, delimiter)
+                break
+            case "SHA3":
+                csvSave(line, SHA3(line), savePath, delimiter)
+                break
+            case "RIPEMD160":
+                csvSave(line, RIPEMD160(line), savePath, delimiter)
+                break
+            default:
+                console.log(line)
+        }
+    });
+
+}
+hashFromfileNoBuffer("C:/Users/Khris/Documents/GitKraken/Smash-Hash/examples/10-million-password-list-top-1000000.txt", "MD5", "C:/Users/Khris/Documents/GitKraken/Smash-Hash/examples/hashes.csv", '/')
+//Hashes from a Plain Text file line by line bufffer
