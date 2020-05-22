@@ -4,25 +4,29 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/mathjs": "^6.0.5",
+    "atomic-sleep": "^1.0.0",
     "count-lines-in-file": "^1.1.0",
     "crypto-js": "^4.0.0",
-    "fast-csv": "^4.2.0",
     "fs-extra": "^9.0.0",
-    "line-reader": "^0.4.0"
+    "mathjs": "^7.0.0",
+    "terminal-kit": "^1.35.2"
   },
   "devDependencies": {
+    "@types/terminal-kit": "^1.28.2",
     "@types/crypto-js": "^3.1.46",
     "@types/fs-extra": "^9.0.1",
     "@types/line-reader": "0.0.29",
     "@types/node": "^14.0.5",
     "node-ts": "^5.0.5",
     "ts-node": "^8.10.1",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "tsc-watch": "^4.2.7"
   },
   "scripts": {
     "start": "node dist/app.js",
     "prestart": "tsc -p .",
-    "dev": "nodemon src/app.ts",
+    "dev": "tsc-watch src/app.ts",
     "build": "tsc -p ."
   },
   "keywords": [],
