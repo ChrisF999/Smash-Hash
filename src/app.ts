@@ -89,7 +89,7 @@ function hashFromfileNoBuffer(path: string, hashtype: string, savePath: string, 
         console.log('done')
     })
 }
-hashFromfileNoBuffer("C:/Users/Khris/Documents/GitKraken/Smash-Hash/examples/10-million-password-list-top-1000000.txt", "MD5", "C:/Users/Khris/Documents/GitKraken/Smash-Hash/examples/hashes.csv", '/')
+hashFromfileNoBuffer("./examples/10-million-password-list-top-1000000.txt", "MD5", "./examples/hashes.csv", '/')
 
 
 function hashFromfileBuffer(path: string, hashtype: string, savePath: string, delimiter: string) {
