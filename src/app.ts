@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import fs from "fs-extra";
+import * as crypto from "crypto";
+import * as fs from "fs-extra";
 const countLinesInFile = require('count-lines-in-file');
 
 
@@ -36,93 +36,71 @@ function RIPEMD160(tohash: string) {
     return (crypto.createHash('RIPEMD160').update(tohash).digest('hex'))
 }
 //CVS File Saver
-function csvSave(toCVSPass: string, toCVSHash: string, path: string, delimiter: string) {
-    try {
-        fs.ensureFile(path)
-        //console.log('File Exits')
-        fs.appendFile(path, `${toCVSPass}${delimiter}${toCVSHash}\r\n`, (err) => {
-            if (err) throw err;
-        });
+let writeBuffer: Array<string> = []
+async function csvSave(toCVSPass: string, toCVSHash: string, path: string, delimiter: string, bufferSize: number) {
 
+    try {
+        writeBuffer.push(`${toCVSHash}${delimiter}${toCVSPass}\r\n`)
+        if (writeBuffer.length != bufferSize) return
+        fs.ensureFile(path)
+        let writeStream = fs.createWriteStream(path, { flags: 'a' });
+        writeBuffer.forEach(line => {
+            writeStream.write(`${line}`);
+        });
+        writeBuffer = []
+        writeStream.end();
     } catch (err) {
         console.error(err)
     }
 }
-//Hashes from a Plain Text file line by line no bufffer
-function hashFromfileNoBuffer(path: string, hashtype: string, savePath: string, delimiter: string) {
-    const readline = require('readline').createInterface({
-        input: require('fs').createReadStream(path)
-    });
-    readline.on('line', function (line: string) {
-        switch (hashtype) {
-            case "MD5":
-                csvSave(line, MD5(line), savePath, delimiter)
-                break;
-            case "SHA1":
-                csvSave(line, SHA1(line), savePath, delimiter)
-                break;
-            case "SHA256":
-                csvSave(line, SHA256(line), savePath, delimiter)
-                break
-            case "SHA224":
-                csvSave(line, SHA224(line), savePath, delimiter)
-                break
-            case "SHA512":
-                csvSave(line, SHA512(line), savePath, delimiter)
-                break
-            case "SHA384":
-                csvSave(line, SHA384(line), savePath, delimiter)
-                break
-            case "SHA3":
-                csvSave(line, SHA3(line), savePath, delimiter)
-                break
-            case "RIPEMD160":
-                csvSave(line, RIPEMD160(line), savePath, delimiter)
-                break
-            default:
-                console.log(line)
-        }
 
+//Hashes from a Plain Text file line by line bufffer
+function hashFromfileNoBuffer(path: string, hashtype: string, savePath: string, delimiter: string, bufferSize: number) {
+    let readStream = fs.createReadStream(path);
 
-    });
-    readline.on('close', function () {
+    readStream.on('data', function (data) {
+
+        let lines: Array<string> = []
+        lines = data.toString().split('\n')
+        lines.forEach(line => {
+            switch (hashtype) {
+                case "MD5":
+                    csvSave(line.toString(), MD5(line.toString()), savePath, delimiter, bufferSize)
+                    break;
+                case "SHA1":
+                    csvSave(line.toString(), SHA1(line.toString()), savePath, delimiter, bufferSize)
+                    break;
+                case "SHA256":
+                    csvSave(line.toString(), SHA256(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                case "SHA224":
+                    csvSave(line.toString(), SHA224(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                case "SHA512":
+                    csvSave(line.toString(), SHA512(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                case "SHA384":
+                    csvSave(line.toString(), SHA384(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                case "SHA3":
+                    csvSave(line.toString(), SHA3(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                case "RIPEMD160":
+                    csvSave(line.toString(), RIPEMD160(line.toString()), savePath, delimiter, bufferSize)
+                    break
+                default:
+                    console.log(line)
+            }
+        });
+    }).on('end', function () {
         console.log('done')
-    })
-}
-hashFromfileNoBuffer("./examples/10-million-password-list-top-1000000.txt", "MD5", "./examples/hashes.csv", '/')
-
-
-function hashFromfileBuffer(path: string, hashtype: string, savePath: string, delimiter: string) {
-
-    let lines = fs.readFileSync(path).toString().split("\n");
-    lines.forEach(line => {
-        switch (hashtype) {
-            case "MD5":
-                csvSave(line, MD5(line), savePath, delimiter)
-                break;
-            case "SHA1":
-                csvSave(line, SHA1(line), savePath, delimiter)
-                break;
-            case "SHA256":
-                csvSave(line, SHA256(line), savePath, delimiter)
-                break
-            case "SHA224":
-                csvSave(line, SHA224(line), savePath, delimiter)
-                break
-            case "SHA512":
-                csvSave(line, SHA512(line), savePath, delimiter)
-                break
-            case "SHA384":
-                csvSave(line, SHA384(line), savePath, delimiter)
-                break
-            case "SHA3":
-                csvSave(line, SHA3(line), savePath, delimiter)
-                break
-            case "RIPEMD160":
-                csvSave(line, RIPEMD160(line), savePath, delimiter)
-                break
-            default:
-                console.log(line)
-        }
     });
+}
+
+
+try {
+    hashFromfileNoBuffer("./examples/10-million-password-list-top-1000000.txt", "SHA512", "./examples/hashes.csv", '/', 100000)
+
+} catch (err) {
+    console.error(err)
 }
