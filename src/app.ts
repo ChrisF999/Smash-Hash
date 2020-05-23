@@ -1,8 +1,8 @@
 import * as crypto from "crypto";
 import * as fs from "fs-extra";
 import { terminal } from "terminal-kit";
-import * as math from 'mathjs'
-
+import * as math from 'mathjs';
+import * as os from "os";
 const countLines = require('count-lines-in-file')
 //MD5 Hash Fuction
 function MD5(tohash: string) {
@@ -58,11 +58,9 @@ async function csvSave(toCVSPass: string, toCVSHash: string, path: string, delim
 //Hashes from a Plain Text file line by line bufffer
 function hashFromfileNoBuffer(path: string, hashtype: string, savePath: string, delimiter: string, bufferSize: number) {
     let readStream = fs.createReadStream(path);
-
     readStream.on('data', function (data) {
-
         let lines: Array<string> = []
-        lines = data.toString().split('\n')
+        lines = data.toString().split(os.EOL)
         lines.forEach(line => {
             switch (hashtype) {
                 case "MD5":
@@ -118,7 +116,6 @@ function uiInputFile() {
                     terminal.red.bold('\nFile cound not be found. Check if file exsits.\n')
                     uiInputFile()
                 }
-
             }
         }
     );
@@ -180,7 +177,6 @@ function setLineBuffer(path: string, savePath: string, hash: string, delimiter: 
             '1'
         ]
         terminal('Select the number of lines to buffer before writing to file. (Higher is usualy faster but with a higher memeory cost)')
-
         terminal.singleLineMenu(arraylinenum, { style: terminal.inverse, }, function (error, response) {
             terminal('\n').eraseLineAfter.green(
                 "Selected: %s\n",
@@ -224,11 +220,3 @@ try {
 } catch (error) {
     console.log(error)
 }
-
-
-/* try {
-    hashFromfileNoBuffer("./examples/10-million-password-list-top-1000000.txt", "SHA512", "./examples/hashes.csv", '/', 100000)
-
-} catch (err) {
-    console.error(err)
-} */
