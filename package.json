@@ -16,7 +16,7 @@
     "@types/terminal-kit": "^1.28.2",
     "@types/crypto-js": "^3.1.46",
     "@types/fs-extra": "^9.0.1",
-    "@types/line-reader": "0.0.29",
+    "@types/line-reader": "0.0.30",
     "@types/node": "^14.0.5",
     "node-ts": "^5.0.5",
     "ts-node": "^8.10.1",
