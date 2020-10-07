@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/terminal-kit": "^1.28.2",
-    "@types/crypto-js": "^3.1.46",
+    "@types/crypto-js": "^4.0.1",
     "@types/fs-extra": "^9.0.1",
     "@types/line-reader": "0.0.30",
     "@types/node": "^14.0.5",
