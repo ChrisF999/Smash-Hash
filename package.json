@@ -9,7 +9,7 @@
     "count-lines-in-file": "^1.1.0",
     "crypto-js": "^4.0.0",
     "fs-extra": "^9.0.0",
-    "mathjs": "^7.0.0",
+    "mathjs": "^9.3.2",
     "terminal-kit": "^1.35.2"
   },
   "devDependencies": {
